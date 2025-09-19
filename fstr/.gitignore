@@ -1,0 +1,47 @@
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Файлы окружения
+.env
+.env.*
+
+# Базы данных
+*.sqlite3
+*.db
+db.sqlite3
+
+# Статика
+/staticfiles/
+/media/
+
+# PyCharm
+.idea/
+.vscode/
+
+# Логи
+*.log
+
+# Операционные файлы
+*.bak
+*.tmp
+
+# Python кэш
+__pycache__/
+*.py[cod]
+.python-version
+
+# Установочные файлы
+*.egg-info/
+dist/
+build/
+pip-wheel-metadata/
+
+# Миграции (опционально)
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Тестовые данные
+/test_data/
+/debug_emails/
