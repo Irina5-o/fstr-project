@@ -88,7 +88,7 @@ FSTR_DB_PASS=your_strong_password
   "connect": ""
 }
 
-**Успешный ответ (200 OK):**
+Успешный ответ (200 OK):
 {
   "status": 200,
   "message": "Запрос успешно обработан",
