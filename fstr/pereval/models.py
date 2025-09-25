@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 class PerevalUser(models.Model):
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     fam = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     otc = models.CharField(max_length=100, blank=True)
