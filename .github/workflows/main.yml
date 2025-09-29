@@ -32,6 +32,9 @@ jobs:
         echo '${{ secrets.YC_SA_KEY }}' > key.json
         yc config set service-account-key key.json
         
+        # Указываем folder-id для каталога default
+        yc config set folder-id b1gk32sismben1dvilo5
+        
         yc serverless container revision deploy \
           --container-name fstr-container \
           --image cr.yandex/${{ secrets.YC_REGISTRY_ID }}/fstr-app:latest \
