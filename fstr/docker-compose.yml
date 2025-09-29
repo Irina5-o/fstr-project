@@ -1,0 +1,27 @@
+﻿services:
+  web:
+    build: .
+    ports:
+      - '8000:8000'
+    environment:
+      - SECRET_KEY=dev-key-123
+      - DEBUG=True
+      - FSTR_DB_NAME=fstr_db
+      - FSTR_DB_LOGIN=postgres
+      - FSTR_DB_PASS=password
+      - FSTR_DB_HOST=db
+    depends_on:
+      - db
+    command: >
+      sh -c "sleep 15 && 
+             python manage.py migrate && 
+             gunicorn fstr.wsgi:application --bind 0.0.0.0:8000"
+
+  db:
+    image: postgres:14  # МЕНЯЕМ НА ВЕРСИЮ 14
+    environment:
+      - POSTGRES_DB=fstr_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - '5432:5432'
