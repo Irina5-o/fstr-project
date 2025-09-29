@@ -45,3 +45,8 @@ pip-wheel-metadata/
 # Тестовые данные
 /test_data/
 /debug_emails/
+
+# Yandex Cloud CLI
+install-yc.ps1
+install-yc.cmd
+key.json
