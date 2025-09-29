@@ -18,6 +18,7 @@ jobs:
         
     - name: Build and push Docker image
       run: |
+        cd fstr
         docker build -t cr.yandex/${{ secrets.YC_REGISTRY_ID }}/fstr-app:latest .
         docker push cr.yandex/${{ secrets.YC_REGISTRY_ID }}/fstr-app:latest
         
