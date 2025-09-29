@@ -37,11 +37,10 @@ jobs:
           --image cr.yandex/${{ secrets.YC_REGISTRY_ID }}/fstr-app:latest \
           --cores 1 \
           --memory 1GB \
-          --environment \
-            SECRET_KEY='${{ secrets.SECRET_KEY }}',\
-            FSTR_DB_NAME='${{ secrets.FSTR_DB_NAME }}',\
-            FSTR_DB_LOGIN='${{ secrets.FSTR_DB_LOGIN }}',\
-            FSTR_DB_PASS='${{ secrets.FSTR_DB_PASS }}',\
-            FSTR_DB_HOST='${{ secrets.FSTR_DB_HOST }}',\
-            FSTR_DB_PORT='${{ secrets.FSTR_DB_PORT }}',\
-            DEBUG=False
+          --environment SECRET_KEY='${{ secrets.SECRET_KEY }}' \
+          --environment FSTR_DB_NAME='${{ secrets.FSTR_DB_NAME }}' \
+          --environment FSTR_DB_LOGIN='${{ secrets.FSTR_DB_LOGIN }}' \
+          --environment FSTR_DB_PASS='${{ secrets.FSTR_DB_PASS }}' \
+          --environment FSTR_DB_HOST='${{ secrets.FSTR_DB_HOST }}' \
+          --environment FSTR_DB_PORT='${{ secrets.FSTR_DB_PORT }}' \
+          --environment DEBUG='False'
