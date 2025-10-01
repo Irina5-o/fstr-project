@@ -49,3 +49,4 @@ pip-wheel-metadata/
 # Yandex Cloud CLI (оставляем скрипты, скрываем ключи)
 key.json
 *.key
+install-yc.ps1
