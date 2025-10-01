@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from .models import PerevalAdded
 from .serializers import PerevalAddedSerializer, PerevalInfoSerializer, PerevalUpdateSerializer
 
@@ -12,10 +14,39 @@ class SubmitData(APIView):
     Поддерживает методы: GET, POST.
     """
 
+    @swagger_auto_schema(
+        operation_description="Получить список перевалов по email пользователя",
+        manual_parameters=[
+            openapi.Parameter(
+                'user__email',
+                openapi.IN_QUERY,
+                description="Email пользователя для поиска его перевалов",
+                type=openapi.TYPE_STRING,
+                required=True,
+                example="user@example.com"
+            )
+        ],
+        responses={
+            200: PerevalInfoSerializer(many=True),
+            400: openapi.Response(
+                description="Не указан параметр user__email",
+                examples={
+                    'application/json': {
+                        'error': 'Не указан параметр user__email'
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description="Записи не найдены",
+                examples={
+                    'application/json': {
+                        'message': 'Записи не найдены'
+                    }
+                }
+            )
+        }
+    )
     def get(self, request):
-        """
-        GET /submitData/?user__email=<email> - получение записей по email
-        """
         email = request.query_params.get('user__email')
         if not email:
             return Response(
@@ -33,10 +64,46 @@ class SubmitData(APIView):
         serializer = PerevalInfoSerializer(perevals, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_description="Создать новую запись о перевале",
+        request_body=PerevalAddedSerializer,
+        responses={
+            201: openapi.Response(
+                description="Успешное создание перевала",
+                examples={
+                    'application/json': {
+                        'status': 200,
+                        'message': None,
+                        'id': 1
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description="Неверные данные",
+                examples={
+                    'application/json': {
+                        'status': 400,
+                        'message': 'Неверные данные',
+                        'errors': {
+                            'title': ['Это поле обязательно.']
+                        },
+                        'id': None
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="Ошибка сервера",
+                examples={
+                    'application/json': {
+                        'status': 500,
+                        'message': 'Ошибка при сохранении: ...',
+                        'id': None
+                    }
+                }
+            )
+        }
+    )
     def post(self, request):
-        """
-        POST /submitData/ - создание новой записи о перевале.
-        """
         serializer = PerevalAddedSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -73,28 +140,74 @@ class PerevalRetrieveUpdateView(APIView):
     Поддерживает методы: GET, PATCH.
     """
 
+    @swagger_auto_schema(
+        operation_description="Получить информацию о перевале по ID",
+        responses={
+            200: PerevalInfoSerializer,
+            404: openapi.Response(
+                description="Перевал не найден",
+                examples={
+                    'application/json': {
+                        'detail': 'Страница не найдена.'
+                    }
+                }
+            )
+        }
+    )
     def get(self, request, pk):
-        """
-        GET /submitData/<id> - получение одной записи по ID
-        """
         pereval = get_object_or_404(PerevalAdded, pk=pk)
         serializer = PerevalInfoSerializer(pereval)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_description="Редактировать перевал (только со статусом 'new')",
+        request_body=PerevalUpdateSerializer,
+        responses={
+            200: openapi.Response(
+                description="Успешное обновление",
+                examples={
+                    'application/json': {
+                        'state': 1
+                    }
+                }
+            ),
+            400: openapi.Response(
+                description="Ошибка валидации или неверный статус",
+                examples={
+                    'application/json': {
+                        'state': 0,
+                        'message': 'Запись нельзя редактировать, так как её статус не "new"'
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description="Перевал не найден",
+                examples={
+                    'application/json': {
+                        'detail': 'Страница не найдена.'
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description="Ошибка сервера",
+                examples={
+                    'application/json': {
+                        'state': 0,
+                        'message': 'Ошибка при сохранении: ...'
+                    }
+                }
+            )
+        }
+    )
     def patch(self, request, pk):
-        """
-        PATCH /submitData/<id> - редактирование существующей записи
-        """
         pereval = get_object_or_404(PerevalAdded, pk=pk)
 
-        # Проверка статуса записи
         if pereval.status != 'new':
             return Response({
                 'state': 0,
                 'message': 'Запись нельзя редактировать, так как её статус не "new"'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Обрабатываем поле level если оно пришло
         data = request.data.copy()
         if 'level' in data:
             level_data = data.pop('level')
