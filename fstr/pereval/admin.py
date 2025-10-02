@@ -6,7 +6,7 @@ from .models import PerevalUser, PerevalCoords, PerevalAdded, PerevalImage
 class PerevalUserAdmin(admin.ModelAdmin):
     list_display = ('email', 'fam', 'name', 'otc', 'phone', 'get_pereval_count')
     search_fields = ('email', 'fam', 'name')
-    list_filter = ('email',)
+    list_filter = ()
     readonly_fields = ('email',)  # Запретим редактирование email
 
     def get_pereval_count(self, obj):

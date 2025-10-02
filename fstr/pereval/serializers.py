@@ -6,6 +6,9 @@ class PerevalUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = PerevalUser
         fields = ['email', 'fam', 'name', 'otc', 'phone']
+        extra_kwargs = {
+            'email': {'validators': []}  # ОТКЛЮЧАЕМ автоматические валидаторы для email
+        }
 
     def create(self, validated_data):
         # Пытаемся найти пользователя по email
