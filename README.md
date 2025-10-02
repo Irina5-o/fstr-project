@@ -76,23 +76,27 @@ venv\Scripts\activate     # для Windows
 pip install -r requirements.txt
 ```
 
-4. Создайте файл `.env` и заполните его:
+4. Создайте файл `.env` и заполните его по примеру:
 ```bash
-# Для разработки
-SECRET_KEY=your-secret-key-here
-DEBUG=True
+# .env
+SECRET_KEY='your-secret-key-here'
+DEBUG=True  # Установите False для продакшена
+ALLOWED_HOSTS=bbacg4nrhlert7e578rs.containers.yandexcloud.net,localhost,127.0.0.1
+
+# База данных
 FSTR_DB_NAME=fstr_db
 FSTR_DB_LOGIN=postgres
 FSTR_DB_PASS=your-password
-FSTR_DB_HOST=localhost
+
+# Локальная разработка (раскомментируйте и используйте эти настройки для локальной БД)
+#FSTR_DB_HOST=localhost
+#FSTR_DB_PORT=5432
+#DB_SSL_MODE=disable
+
+# Продакшен (Yandex Cloud)
+FSTR_DB_HOST=rc1a-491tr6vedt3dtm83.mdb.yandexcloud.net
 FSTR_DB_PORT=5432
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# Для тестов отключите SSL:
-DB_SSL_MODE=disable
-
-# Для продакшена (Yandex Cloud) используйте:
-# DB_SSL_MODE=require
+DB_SSL_MODE=require
 ```
 
 5. Применить миграции и запустить сервер:
@@ -246,10 +250,11 @@ curl "https://bbacg4nrhlert7e578rs.containers.yandexcloud.net/api/submitData/?us
 - Работу моделей и сериализаторов
 - Дублирование email пользователей
 
-**Автоматическая конфигурация тестов:**
+**Автоматическая конфигурация тестов в settings.py:**
 - При запуске тестов автоматически отключается SSL для локальной БД
 - Включаются оптимизации для ускорения тестов (MD5PasswordHasher)
 - Проверка на использование внешней БД Yandex Cloud (тесты не могут использовать внешнюю БД)
+- Автоматическое переключение между локальной и продакшен БД
 
 **Результаты тестирования:** 24/24 тестов проходят успешно
 
@@ -273,6 +278,19 @@ python manage.py test pereval.tests.PerevalAPITestCase.test_duplicate_user_email
 1. **Локальная база данных**: Тесты требуют локальную PostgreSQL базу данных
 2. **SSL отключение**: Для тестов автоматически отключается SSL режим
 3. **Внешняя БД**: Тесты не могут использовать внешнюю БД Yandex Cloud
+4. **Конфигурация .env**: Убедитесь, что в файле `.env` закомментированы настройки продакшен БД и раскомментированы настройки локальной БД:
+
+```bash
+# Для тестов используйте:
+FSTR_DB_HOST=localhost
+FSTR_DB_PORT=5432
+DB_SSL_MODE=disable
+
+# И закомментируйте продакшен настройки:
+# FSTR_DB_HOST=rc1a-491tr6vedt3dtm83.mdb.yandexcloud.net
+# FSTR_DB_PORT=5432
+# DB_SSL_MODE=require
+```
 
 Если тесты пытаются использовать внешнюю БД Yandex Cloud, система выдаст ошибку с инструкциями по настройке локальной БД.
 
