@@ -137,3 +137,33 @@ if not DEBUG:
 else:
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
+
+
+# Для тестов - автоматически отключаем SSL для локальной БД
+import sys
+
+if 'test' in sys.argv:
+    print("Активирован тестовый режим")
+
+    # Проверяем, не пытаемся ли подключиться к внешней БД при тестах
+    if 'yandexcloud.net' in DATABASES['default']['HOST']:
+        print("ОШИБКА: Тесты не могут использовать внешнюю БД Yandex Cloud")
+        print("Решение: Запустите тесты с локальной PostgreSQL")
+        print("Убедитесь, что:")
+        print("1. У вас запущен локальный PostgreSQL")
+        print("2. Создана база 'fstr_db'")
+        print("3. В .env указан FSTR_DB_HOST=localhost")
+        print("4. В .env указан DB_SSL_MODE=disable")
+        sys.exit(1)
+
+    # Автоматически отключаем SSL для локальной БД при тестах
+    if 'OPTIONS' in DATABASES['default'] and 'sslmode' in DATABASES['default']['OPTIONS']:
+        DATABASES['default']['OPTIONS'].pop('sslmode')
+        print("SSL отключен для локальной БД")
+
+    # Оптимизации для ускорения тестов
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
+
+    print("Тесты используют локальную БД")
