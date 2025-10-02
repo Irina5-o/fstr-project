@@ -35,7 +35,8 @@ fstr-project/
 │   │   ├── serializers.py         # Сериализаторы для POST/GET/PATCH
 │   │   ├── views.py               # Реализация логики API
 │   │   ├── urls.py                # Маршруты приложения
-│   │   └── tests.py               # Тесты API
+│   │   ├── tests.py               # Тесты API (24 теста)
+│   │   └── admin.py               # Админ-панель
 │   ├── manage.py
 │   ├── requirements.txt
 │   ├── Dockerfile
@@ -68,7 +69,7 @@ pip install -r requirements.txt
 ```
 
 4. Создайте файл `.env` и заполните его:
-
+```bash
 SECRET_KEY=your-secret-key-here
 DEBUG=True
 FSTR_DB_NAME=fstr_db
@@ -77,6 +78,7 @@ FSTR_DB_PASS=your-password
 FSTR_DB_HOST=localhost
 FSTR_DB_PORT=5432
 ALLOWED_HOSTS=localhost,127.0.0.1
+```
 
 5. Применить миграции и запустить сервер:
 ```bash
@@ -140,9 +142,9 @@ curl "https://bbacg4nrhlert7e578rs.containers.yandexcloud.net/api/submitData/?us
 ```
 
 ### CI/CD процесс:
--  Автоматические тесты при каждом PR
--  Автоматический деплой на Yandex Cloud Serverless Containers при пуше в main
--  Health-checks и мониторинг
+- Автоматические тесты при каждом PR
+- Автоматический деплой на Yandex Cloud Serverless Containers при пуше в main
+- Health-checks и мониторинг
 
 ## Документация API
 
@@ -207,13 +209,27 @@ curl "https://bbacg4nrhlert7e578rs.containers.yandexcloud.net/api/submitData/?us
 - `accepted` - Принята
 - `rejected` - Отклонена
 
-## Ограничения
+## Ограничения и бизнес-логика
 
-- Перевал можно редактировать только если его статус — "new"
-- Для создания перевала требуется, чтобы пользователь с указанным email уже существовал или был создан вместе с перевалом
-- Email пользователя должен быть уникальным
+- **Редактирование**: Перевал можно редактировать только если его статус — "new"
+- **Пользователи**: При создании перевала система автоматически находит существующего пользователя по email или создает нового
+- **Защита данных**: Данные пользователя (email, ФИО, телефон) защищены от изменений при создании новых перевалов
+- **Уникальность**: Email пользователя должен быть уникальным в системе
+- **Изображения**: При обновлении перевала старые изображения полностью заменяются новыми
 
 ## Тестирование
+ 
+Проект покрыт 24 автоматическими тестами, которые проверяют:
+
+- Создание перевалов с валидными и невалидными данными
+- Получение данных по ID и email
+- Обновление перевалов (только со статусом "new")
+- Защиту данных пользователя от изменений
+- Обработку ошибок и граничные случаи
+- Работу моделей и сериализаторов
+- Дублирование email пользователей
+
+**Результаты тестирования:** 24/24 тестов проходят успешно
 
 ```bash
 # Локальный запуск тестов
@@ -222,12 +238,19 @@ python manage.py test
 
 # Запуск тестов через Docker
 docker-compose run web python manage.py test
+
+# Запуск с подробным выводом
+python manage.py test -v 2
+
+# Запуск конкретного теста
+python manage.py test pereval.tests.PerevalAPITestCase.test_duplicate_user_email
 ```
 
 ## Контакты
 
 **Разработчик**: Ирина  
-**Email**: irinaosk206@gmail.com
+**Email**: irinaosk206@gmail.com  
+**GitHub**: [Irina5-o](https://github.com/Irina5-o)
 
 ---
 
